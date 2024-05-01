@@ -1,0 +1,7 @@
+&i2c1 {
+    mysensor: mysensor@5c {
+        compatible ="i2c-device";
+        reg = < 0x5c >;
+        label = "MYSENSOR";
+    };
+};

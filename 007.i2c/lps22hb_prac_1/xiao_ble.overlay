@@ -1,0 +1,6 @@
+&i2c1 {
+	lps22hb@5c {
+		compatible = "st,lps22hb-press"; // to get compatible string name see binding c:\ncs\v2.5.2\zephyr\dts\bindings\sensor\st,lps22hb-press.yaml
+		reg = <0x5c>;
+	};
+};
