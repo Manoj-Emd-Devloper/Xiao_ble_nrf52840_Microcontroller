@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2021 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+ / {
+	buttons {
+		compatible = "gpio-keys";
+		button0: button_0 {
+			gpios = <&gpio0 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "Push button switch 0";
+			zephyr,code = <INPUT_KEY_0>;
+			status = "okay";
+		};
+		// button1: button_1 {
+		// 	gpios = <&gpio0 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		// 	label = "Push button switch 1";
+		// 	zephyr,code = <INPUT_KEY_1>;
+		// };
+		// button2: button_2 {
+		// 	gpios = <&gpio0 28 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		// 	label = "Push button switch 2";
+		// 	zephyr,code = <INPUT_KEY_2>;
+		// };
+		// button3: button_3 {
+		// 	gpios = <&gpio0 29 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		// 	label = "Push button switch 3";
+		// 	zephyr,code = <INPUT_KEY_3>;
+		// };
+	};
+
+	aliases {
+		sw0=&button0;
+		// sw1 = &button1;
+		// sw2 = &button2;
+		// sw3 = &button3;
+	};
+
+};
+
+&zephyr_udc0 {
+	cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+    //in xiao ble have the uart 0 not uart 1
+	// cdc_acm_uart1 {
+	// 	compatible = "zephyr,cdc-acm-uart";
+	// };
+};

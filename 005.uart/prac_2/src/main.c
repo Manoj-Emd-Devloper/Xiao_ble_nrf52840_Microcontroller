@@ -34,7 +34,7 @@ int main(void)
                                 rx_buffer[rx_index] = '\0';
 
                                 /* Print the received string */
-                                LOG_INF("Received: %s\n\r", rx_buffer);
+                                LOG_INF("Received: %s", rx_buffer);
 
                                 /* Reset buffer index for the next string */
                                 rx_index = 0;
