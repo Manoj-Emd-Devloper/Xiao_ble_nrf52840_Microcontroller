@@ -17,7 +17,7 @@ int main(void)
         ring_buf_init(&ringbuf, BUF_SIZE, buffer);
 label:
         // Example usage: writing data to the ring buffer
-        uint8_t data_write[] = {0};
+        uint8_t data_write[50] = {0};
         uint8_t data_read[BUF_SIZE];
         uint8_t received = 0;
         uint8_t i = 0;
@@ -46,7 +46,7 @@ label:
 
         data_write[i] = '\0';
 
-        int bytes_written = ring_buf_put(&ringbuf, data_write, strlen(data_write)-1);
+        int bytes_written = ring_buf_put(&ringbuf, data_write, strlen(data_write));
         if (bytes_written < 0)
         {
                 printk("Error writing to ring buffer\n");

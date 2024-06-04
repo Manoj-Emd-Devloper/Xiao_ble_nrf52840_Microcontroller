@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 
 /* 1000 msec = 1 sec */
-#define SLEEP_TIME_MS 5000
+#define SLEEP_TIME_MS 2000
 
 /* The devicetree node identifier for the "led0" alias. */
 #define LED0_NODE DT_ALIAS(led0)
