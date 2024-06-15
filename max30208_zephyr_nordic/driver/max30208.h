@@ -70,6 +70,17 @@ float max30208_toCelsius(uint16_t rawTemp);
 float max30208_toFahrenheit(float temperatureC);
 
 int32_t max30208_set_GPIOControl(const struct i2c_dt_spec *spec);
+int32_t max30208_get_GPIOSetup(const struct i2c_dt_spec *spec, uint8_t *value);
 int32_t max30208_configure_gpio(const struct i2c_dt_spec *spec);
 int32_t max30208_enable_interrupts(const struct i2c_dt_spec *spec);
+int32_t max30208_get_enable_interrupts(const struct i2c_dt_spec *spec, uint8_t *value);
+
+int8_t alarm_low_setup(uint8_t *reg_AL);
+int32_t max30208_set_AlarmLow(const struct i2c_dt_spec *spec, uint8_t *temp);
+int32_t max30208_get_AlarmLow(const struct i2c_dt_spec *spec, uint8_t *value);
+int8_t alarm_high_setup(uint8_t *reg_AH);
+int32_t max30208_set_AlarmHigh(const struct i2c_dt_spec *spec, uint8_t *temp);
+int32_t max30208_get_AlarmHigh(const struct i2c_dt_spec *spec, uint8_t *temp);
+
+
 #endif

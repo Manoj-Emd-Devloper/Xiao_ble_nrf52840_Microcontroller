@@ -371,26 +371,228 @@ int32_t MAX30208_GetRawData(const struct i2c_dt_spec *spec, uint16_t *data)
 	return 0;
 }
 
-// #define MAX30208_DEFINE(inst)                                                                      \
-//                                                                                                    \
-// 	static struct max30208_data max30208_data_##inst;                                          \
-//                                                                                                    \
-// 	static const struct max30208_config max30208_config_##inst = {                             \
-// 		.spi = SPI_DT_SPEC_INST_GET(inst, SPI_MODE_CPHA | SPI_WORD_SET(8), 0),             \
-// 		.resistance_at_zero = DT_INST_PROP(inst, resistance_at_zero),                      \
-// 		.resistance_reference = DT_INST_PROP(inst, resistance_reference),                  \
-// 		.conversion_mode = false,                                                          \
-// 		.one_shot = true,                                                                  \
-// 		.three_wire = DT_INST_PROP(inst, maxim_3_wire),                                    \
-// 		.fault_cycle = MAX31865_FAULT_DETECTION_NONE,                                      \
-// 		.filter_50hz = DT_INST_PROP(inst, filter_50hz),                                    \
-// 		.low_threshold = DT_INST_PROP(inst, low_threshold),                                \
-// 		.high_threshold = DT_INST_PROP(inst, high_threshold),                              \
-// 	};                                                                                         \
-//                                                                                                    \
-// 	SENSOR_DEVICE_DT_INST_DEFINE(inst, max31865_init, NULL, &max31865_data_##inst,             \
-// 			      &max31865_config_##inst, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,   \
-// 			      &max31865_api_funcs);
 
-// /* Create the struct device for every status "okay" node in the devicetree. */
-// DT_INST_FOREACH_STATUS_OKAY(MAX30208_DEFINE)
+
+int32_t max30208_get_AlarmHigh(const struct i2c_dt_spec *spec, uint8_t *temp)
+{
+        int32_t ret;
+
+        ret = read_register(spec, ALARM_HIGH_MSB, temp, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read ALARM_HIGH_MSB");
+                return -1;
+        }
+        return 0;
+}
+
+int32_t max30208_set_AlarmHigh(const struct i2c_dt_spec *spec, uint8_t *temp)
+{
+        int32_t ret;
+        uint8_t reg[2] = {ALARM_HIGH_MSB, temp[0]};
+        ret = write_register(spec, reg, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to write ALARM_HIGH_MSB");
+                return -1;
+        }
+        reg[0] = ALARM_HIGH_LSB;
+        reg[1] = temp[1];
+        ret = write_register(spec, reg, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to write ALARM_HIGH_MSB");
+                return -1;
+        }
+        return 0;
+}
+
+int8_t alarm_high_setup(uint8_t *reg_AH)
+{
+        int ret;
+        uint8_t ret_AH[2] = {0X00};
+        ret = max30208_get_AlarmHigh(&max30208, ret_AH);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read alarm high");
+                return -1;
+        }
+        LOG_INF("Alarm high: 0x%02x%02x", ret_AH[0], ret_AH[1]);
+        ret = max30208_set_AlarmHigh(&max30208, reg_AH);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to write alarm high");
+                return -1;
+        }
+
+        ret = max30208_get_AlarmHigh(&max30208, ret_AH);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read alarm high");
+                return -1;
+        }
+        LOG_INF("Alarm high: 0x%02x%02x", ret_AH[0], ret_AH[1]);
+        return 0;
+}
+
+int32_t max30208_get_AlarmLow(const struct i2c_dt_spec *spec, uint8_t *value)
+{
+        int8_t ret;
+        ret = read_register(spec, ALARM_LOW_MSB, value, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read ALARM_LOW_MSB");
+                return -1;
+        }
+        return 0;
+}
+
+int32_t max30208_set_AlarmLow(const struct i2c_dt_spec *spec, uint8_t *temp)
+{
+        int32_t ret;
+        uint8_t reg[2] = {ALARM_LOW_MSB, temp[0]};
+        ret = write_register(spec, reg, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to write ALARM_LOW_MSB");
+                return -1;
+        }
+        reg[0] = ALARM_LOW_LSB;
+        reg[1] = temp[1];
+        ret = write_register(spec, reg, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to write ALARM_LOW_MSB");
+                return -1;
+        }
+        return 0;
+}
+
+int8_t alarm_low_setup(uint8_t *reg_AL)
+{
+        int8_t ret;
+        uint8_t ret_AL[2] = {0X00};
+        ret = max30208_get_AlarmLow(&max30208, ret_AL);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read alarm low");
+                return -1;
+        }
+        ret = max30208_set_AlarmLow(&max30208, reg_AL);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to write alarm low");
+                return -1;
+        }
+        ret = max30208_get_AlarmLow(&max30208, ret_AL);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read alarm low");
+                return -1;
+        }
+        return 0;
+}
+
+int32_t max30208_get_enable_interrupts(const struct i2c_dt_spec *spec, uint8_t *value)
+{
+        int32_t ret;
+        ret = read_register(spec, INTERRUPT_CONF, value, 1);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read ALARM_LOW_MSB");
+                return -1;
+        }
+        return 0;
+}
+
+int32_t max30208_enable_interrupts(const struct i2c_dt_spec *spec)
+{
+        int32_t ret;
+        uint8_t value = 0;
+        ret = max30208_get_enable_interrupts(spec, &value);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read ALARM_LOW_MSB");
+                return -1;
+        }
+        LOG_INF("int : 0x%02x ", value);
+        uint8_t reg[2] = {INTERRUPT_CONF, 0x02}; // Enable TEMP_LO and TEMP_HI interrupts
+        ret = write_register(spec, reg, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to enable interrupts");
+                return -1;
+        }
+        return 0;
+}
+
+int32_t max30208_get_GPIOSetup(const struct i2c_dt_spec *spec, uint8_t *value)
+{
+        int32_t ret;
+        ret = read_register(spec, GPIO_SETUP, value, 1);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read ALARM_LOW_MSB");
+                return -1;
+        }
+        return 0;
+}
+
+int32_t max30208_configure_gpio(const struct i2c_dt_spec *spec)
+{
+
+        int32_t ret;
+        uint8_t ret_GPCL[1] = {0X00};
+        ret = read_register(&max30208, GPIO_SETUP, ret_GPCL, 1);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read GPIO control");
+                return -1;
+        }
+        LOG_INF("GPIO con: 0x%02x", ret_GPCL[0]);
+        uint8_t reg[2] = {GPIO_SETUP, 0xAB}; // Configure GPIO0 as interrupt output
+        ret = write_register(spec, reg, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to configure GPIO");
+                return -1;
+        }
+        ret = read_register(&max30208, GPIO_SETUP, ret_GPCL, 1);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read GPIO control");
+                return -1;
+        }
+        LOG_INF("GPIO con: 0x%02x", ret_GPCL[0]);
+        return 0;
+}
+
+int32_t max30208_set_GPIOControl(const struct i2c_dt_spec *spec)
+{
+        int32_t ret;
+        uint8_t ret_GPCL[1] = {0X00};
+        ret = read_register(&max30208, GPIO_CONTROL, ret_GPCL, 1);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read GPIO control");
+                return -1;
+        }
+        LOG_INF("GPIO Control: 0x%02x", ret_GPCL[0]);
+
+        uint8_t reg[2] = {GPIO_CONTROL, 0x01};
+        ret = write_register(spec, reg, 2);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to set GPIO control");
+                return -1;
+        }
+
+        ret = read_register(&max30208, GPIO_CONTROL, ret_GPCL, 1);
+        if (ret < 0)
+        {
+                LOG_ERR("Failed to read GPIO control");
+                return -1;
+        }
+        LOG_INF("GPIO Control: 0x%02x", ret_GPCL[0]);
+        return 0;
+}
