@@ -1,0 +1,19 @@
+&i2c1 {
+    status = "okay";
+    pinctrl-0 = <&i2c1_default>;
+    max30208: max30208@50 {
+        compatible = "i2c-device";
+        status = "okay";
+        reg = <0x50>;
+    };
+};
+
+&pinctrl {
+    i2c1_default: i2c1_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 5)>;
+            bias-disable;
+        };
+    };
+};

@@ -4,20 +4,19 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/sys/printk.h>
 
-#define SLEEP_TIME_MS 10 * 60 * 1000
+#define SLEEP_TIME_MS 1000
 #define SW0_NODE DT_ALIAS(sw0)
 #define LED0_NODE DT_ALIAS(led0)
 
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(SW0_NODE, gpios);
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 static struct gpio_callback button_cb_data;
-
-void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
-{       
+volatile uint8_t flag = 0;
+void button_pressed(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
+{
         printk("interrupt\n\r");
-        gpio_pin_toggle_dt(&led);
+        flag = 1;
 }
-
 
 int main(void)
 {
@@ -38,18 +37,28 @@ int main(void)
         {
                 return -1;
         }
-        
-        ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_TO_ACTIVE );
+
+        ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_TO_ACTIVE);
         if (ret < 0)
         {
                 return -1;
         }
-        
-        gpio_init_callback(&button_cb_data,button_pressed,BIT(button.pin));
+
+        gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
 
         gpio_add_callback(button.port, &button_cb_data);
 
-        while(1){
+        while (1)
+        {
+                if (flag == 1)
+                {
+                        gpio_pin_set_dt(&led, 1);
+                        flag = 0;
+                }
+                else
+                {
+                        gpio_pin_set_dt(&led, 0);
+                }
                 k_msleep(SLEEP_TIME_MS);
         }
 }
