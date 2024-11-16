@@ -38,7 +38,13 @@ int main(void)
                 return -1;
         }
 
-        ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_TO_ACTIVE);
+        ret = gpio_pin_configure_dt(&button, GPIO_INPUT);
+	if (ret < 0)
+	{
+		return -1;
+	}
+
+        ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_FALLING);
         if (ret < 0)
         {
                 return -1;
